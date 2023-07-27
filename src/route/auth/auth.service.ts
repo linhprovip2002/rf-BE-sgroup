@@ -27,6 +27,15 @@ class authService {
                 });
         });
     }
+    async createUser(newUser: User): Promise<void> {
+        return new Promise((resolve, reject) => {
+            poolKnex('users').insert(newUser).then(() => {
+                resolve();
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
 }
 
 export default new authService();
