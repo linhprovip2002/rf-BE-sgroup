@@ -13,7 +13,7 @@ function signJwt(user:User,roles: string[])
             name: user.name,
             username: user.username,
             email: user.email,
-            role: roles
+            roles
         }, jwtSecret, { expiresIn: '1h', algorithm: 'HS256' });
 }
 

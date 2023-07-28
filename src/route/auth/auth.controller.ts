@@ -3,6 +3,7 @@ import authService from './auth.service';
 import { hashPassword, hashPasswordSalt, signJwt } from '../../service';
 import { User } from '../../model';
 import crypto from 'crypto';
+import { mailService } from '../../service';
 class authController {
     async login(req: Request, res: Response, next: NextFunction) {
         const { username, password } = req.body;
@@ -15,12 +16,17 @@ class authController {
             return res.status(400).json('password is wrong');
         }
         return await authService.findRole(user.id).then((roles) => {
+            roles = roles.map((role) => {
+                return role.role_name;
+            });
+            // console.log(roles);
+            
             const token = signJwt(user, roles);
             return res.status(200).json({ status: 200, message: 'Login successfully', token: token });
-        }).catch((err) => {
+          }).catch((err) => {
             console.log(err);
             next(err);
-        })
+          });
 
     }
     async register(req: Request, res: Response, next: NextFunction) {
@@ -52,6 +58,26 @@ class authController {
         try {
             await authService.createUser(newUser);
             return res.status(200).json('register successfully');
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+        return res.status(500).json('An unexpected error occurred.');
+    }
+    async forgotPassword(req: Request, res: Response, next: NextFunction) {
+        const { username, email } = req.body;
+        const user = await authService.getUserByUsername(username);
+        if (!user) {
+            return res.status(400).json('email is not exist');
+        }
+        const htmlTemplate = `
+        <h1>Forgot Password</h1>
+        <p>Click <a href="http://localhost:3000/reset-password/${user.passwordResetToken}">here</a> to reset your password</p>
+        `;
+        
+        try {
+            await mailService.sendMail(email, 'Forgot Password', htmlTemplate);
+            return res.status(200).json('send mail successfully');
         } catch (err) {
             console.log(err);
             next(err);

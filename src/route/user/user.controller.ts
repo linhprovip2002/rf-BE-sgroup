@@ -1,7 +1,7 @@
 import {Request,Response,NextFunction} from 'express';
 import userService from './user.service';
 class UserController{
-    getUsers(req:Request,res:Response,next:NextFunction): void 
+    getUsers(req,res:Response,next:NextFunction): void 
     {
         userService.getAllUser().then((users) => {
             return res.status(200).json(users);

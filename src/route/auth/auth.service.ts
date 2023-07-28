@@ -12,12 +12,12 @@ class authService {
             );
         });
     }
-    async findRole(id: number): Promise<string[]> {
+    async findRole(id: number): Promise<any> {
         return new Promise((resolve, reject) => {
             poolKnex('role')
+                .select('role.role_name')
                 .join('user_role', 'role.role_id', '=', 'user_role.role_id')
                 .join('users', 'users.id', '=', 'user_role.user_id')
-                .select('*')
                 .where('users.id', id)
                 .then((roles) => {
                     resolve(roles);
