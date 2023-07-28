@@ -36,6 +36,26 @@ class authService {
             });
         });
     }
+    async findUserByToken(token: string): Promise<User> {
+        return new Promise((resolve, reject) => {
+            poolKnex('users').select().where('passwordResetToken', token).then((user) => {
+                resolve(user[0]);
+            }
+            ).catch((err) => {
+                reject(err);
+            }
+            );
+        });
+    }
+    async updateUserByToken( newUser:Object , id : number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            poolKnex('users').update(newUser).where('id', id).then(() => {
+                resolve();
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
 }
 
 export default new authService();

@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import {mailConfig} from '../../config/mailConfig';
   const mailService = {
-    async sendMail (emailTo, subject, text) {
+    async sendMail (emailTo, subject, text, html) {
       console.log(mailConfig);
       const transporter = nodemailer.createTransport(mailConfig);
   
@@ -9,7 +9,8 @@ import {mailConfig} from '../../config/mailConfig';
         from: process.env.SMTP_USER,
         to: emailTo,
         subject,
-        text
+        text: text || '',
+        html: html || ''
       }, (err, info) => {
         if (err) {
           console.log(err);
