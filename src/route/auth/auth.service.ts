@@ -47,7 +47,7 @@ class authService {
             );
         });
     }
-    async updateUserByToken( newUser:Object , id : number): Promise<void> {
+    async updateUserByToken(newUser: Object, id: number): Promise<void> {
         return new Promise((resolve, reject) => {
             poolKnex('users').update(newUser).where('id', id).then(() => {
                 resolve();
@@ -56,6 +56,22 @@ class authService {
             });
         });
     }
+    async findPermissionByRole(role: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            poolKnex('permissions').select('permissions.permission_name')
+                .from('permissions')
+                .join('role_permission', 'permissions.permission_id', '=', 'role_permission.permission_id')
+                .join('role', 'role.role_id', '=', 'role_permission.role_id')
+                .where('role.role_name', role).then((permissions) => {
+                    // console.log(permissions);
+                    resolve(permissions);
+                }
+                ).catch((err) => {
+                    reject(err);
+                }
+                );
+        });
+    };
 }
 
 export default new authService();

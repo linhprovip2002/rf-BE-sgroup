@@ -1,7 +1,7 @@
 import redis from '../../config/redis';
 const time = 60 * 60 * 24 * 30;
 class CacheService {
-    async set(key: string, nestedKey: string, value: any) {
+    async set(key: string, nestedKey: number, value: any) {
         try {
             if (!redis.isOpen) {
                 await redis.connect();
@@ -14,7 +14,7 @@ class CacheService {
             throw err;
         }
     }
-    async get(key, nestedKey) {
+    async get(key:string, nestedKey:number) {
         try {
 
             if (!redis.isOpen) {
@@ -28,7 +28,7 @@ class CacheService {
             throw err;
         }
     }
-    async delete (key, nestedKey) {
+    async delete (key:string, nestedKey:number) {
         if (!redis.isOpen) {
           await redis.connect();
         }

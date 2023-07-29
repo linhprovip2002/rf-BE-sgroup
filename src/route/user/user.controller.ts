@@ -3,14 +3,14 @@ import userService from './user.service';
 import cacheService from '../../service/cache/cache.service';
 class UserController {
     getUsers(req, res: Response, next: NextFunction): void {
-        cacheService.get('users', 'all').then((users) => {
+        cacheService.get('users', 888).then((users) => {
             if (users) {
                 console.log('get users from cache');
-                
+
                 return res.status(200).json(users);
             }
             return userService.getAllUser().then((users) => {
-                cacheService.set('users', 'all', users);
+                cacheService.set('users', 888, users);
                 console.log('get users from db');
                 return res.status(200).json(users);
             }).catch((err) => {
@@ -22,11 +22,22 @@ class UserController {
     }
     getUserById(req: Request, res: Response, next: NextFunction): void {
         const idUser: number = parseInt(req.params.id);
-        userService.getUserById(idUser).then((user) => {
-            return res.status(200).json(user);
-        }).catch((err) => {
+        try {
+            cacheService.get('users', idUser).then((user) => {
+                if (user) {
+                    console.log('get user from cache');
+                    return res.status(200).json(user);
+                } else {
+                    return userService.getUserById(idUser).then((user) => {
+                        cacheService.set('users', idUser, user);
+                        console.log('get user from db');
+                        return res.status(200).json(user);
+                    })
+                }
+            })
+        } catch (err) {
             next(err);
-        });
+        }
     }
     updateUserById(req: Request, res: Response, next: NextFunction): void {
         const idUser: number = parseInt(req.params.id);
