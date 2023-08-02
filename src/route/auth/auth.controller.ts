@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import authService from './auth.service';
+import {authService} from './';
 import { hashPassword, hashPasswordSalt, signJwt } from '../../service';
 import { User } from '../../model';
 import crypto from 'crypto';

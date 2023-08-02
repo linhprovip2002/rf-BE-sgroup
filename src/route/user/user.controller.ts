@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import userService from './user.service';
+import {userService} from './index';
 import cacheService from '../../service/cache/cache.service';
 class UserController {
     getUsers(req, res: Response, next: NextFunction): void {

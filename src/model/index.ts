@@ -1,3 +1,5 @@
 import EnvironmentVariables from './envConfig';
 import User from './userModel';
-export {EnvironmentVariables, User };
+import Option from './optionModel';
+import Poll from './pollModel';
+export {EnvironmentVariables, User, Option, Poll};
