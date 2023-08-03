@@ -8,4 +8,5 @@ route.get('/', pollController.getAllPolls);
 route.get('/:id', pollController.getPollById);
 route.delete('/:id', pollController.deletePollById);
 route.put('/:id', pollController.updatePoll);
+route.post('/:idPoll/vote/:idOption', pollController.votePoll);
 export default route;

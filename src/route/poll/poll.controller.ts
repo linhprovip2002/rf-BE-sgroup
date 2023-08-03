@@ -70,6 +70,18 @@ class pollController {
             next(err);
         }
     }
+    async votePoll(req, res, next) {
+        try
+        {
+            const poll = await pollService.votePoll(req.userToken.id,req.params.idPoll, req.params.idOption);
+            if (poll === 0) {
+                return res.status(404).json("poll not found");
+            }
+            return res.status(200).json("poll updated");
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 export default new pollController();

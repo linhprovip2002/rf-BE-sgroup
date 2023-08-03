@@ -1,5 +1,5 @@
 import poolKnex from "../../config/knex";
-import { Poll } from "../../model";
+import { Poll,Option } from "../../model";
 class pollService {
   async createPoll(Poll: Poll) {
     return new Promise((resolve, reject) => {
@@ -43,12 +43,47 @@ class pollService {
     });
   }
   async getPollById(id: number) {
-    return new Promise((resolve, reject) => {
+    // return new Promise((resolve, reject) => {
+    //   poolKnex.transaction(async (trx) => {
+    //     try {
+    //       const poll: Poll = await trx('poll').select('*').where('poll_id', id).first();
+    //       const options = await trx('option').select('*').where('poll_id', id);
+    //       poll.options = options.map((option) => 
+    //       {
+    //           option.option_id,
+    //           option.poll_id,
+    //           option.option_text,
+    //           option.array_votes = trx('votes').select(('GROUP_CONCAT(user_id) as userIDs'))
+    //           .where('option_id', option.option_id)
+    //       });
+    //       resolve(poll);
+    //     } catch (error) {
+    //       console.log(error);
+    //       reject(error);
+    //     }
+    //   });
+    // });
+    return new Promise<Poll>((resolve, reject) => {
       poolKnex.transaction(async (trx) => {
         try {
-          const poll = await trx('poll').select('*').where('poll_id', id).first();
-          const options = await trx('option').select('*').where('poll_id', id);
-          poll.options = options.map((option) => option.option_text);
+          const poll: Poll = await trx('poll').select('*').where('poll_id', id).first();
+          const options: Option[] = await trx('option').select('*').where('poll_id', id);
+           
+          // Get the votes for each option
+          const optionIds = options.map((option) => option.option_id);
+          const votesPromiseArray = optionIds.map((optionId) => {
+            return trx('votes').select('user_id').where('option_id', optionId);
+          });
+          const votesArray = await Promise.all(votesPromiseArray);
+          const array_votes = votesArray.map((votes) => votes.map((vote) => vote.user_id));
+  
+          poll.options = options.map((option, index) => {
+            return {
+              ...option,
+              array_votes: array_votes[index],
+            };
+          });
+  
           resolve(poll);
         } catch (error) {
           console.log(error);
@@ -94,6 +129,24 @@ class pollService {
         }
       });
     });
+  }
+  async votePoll(idUser: number, idPoll: number, idOption: number) {
+    return new Promise((resolve, reject) => {
+      poolKnex.transaction(async (trx) => {
+        try {
+          const [vote] = await trx('votes').insert({
+            user_id: idUser,
+            poll_id: idPoll,
+            option_id: idOption
+          }).returning('*');
+          resolve(vote);
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      }
+      );
+    })
   }
 }
 
