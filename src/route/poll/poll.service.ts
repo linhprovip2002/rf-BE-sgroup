@@ -1,5 +1,5 @@
 import poolKnex from "../../config/knex";
-import { Poll,Option } from "../../model";
+import { Poll, Option } from "../../model";
 class pollService {
   async createPoll(Poll: Poll) {
     return new Promise((resolve, reject) => {
@@ -68,7 +68,7 @@ class pollService {
         try {
           const poll: Poll = await trx('poll').select('*').where('poll_id', id).first();
           const options: Option[] = await trx('option').select('*').where('poll_id', id);
-           
+
           // Get the votes for each option
           const optionIds = options.map((option) => option.option_id);
           const votesPromiseArray = optionIds.map((optionId) => {
@@ -76,14 +76,14 @@ class pollService {
           });
           const votesArray = await Promise.all(votesPromiseArray);
           const array_votes = votesArray.map((votes) => votes.map((vote) => vote.user_id));
-  
+
           poll.options = options.map((option, index) => {
             return {
               ...option,
               array_votes: array_votes[index],
             };
           });
-  
+
           resolve(poll);
         } catch (error) {
           console.log(error);
@@ -130,15 +130,36 @@ class pollService {
       });
     });
   }
-  async votePoll(idUser: number, idPoll: number, idOption: number) {
+  async checkVoteInPoll(idUser: number, idPoll: number) {
+    return new Promise((resolve, reject) => {
+      poolKnex.transaction(async (trx) => {
+        try {
+          const options = await trx('option').select('*').where('poll_id', idPoll);
+          const optionIds = options.map((option) => option.option_id);
+          const votesPromiseArray = optionIds.map((optionId) => {
+            return trx('votes').select('user_id').where('option_id', optionId);
+          });
+          const votesArray = await Promise.all(votesPromiseArray);
+          const array_votes = votesArray.map((votes) => votes.map((vote) => vote.user_id));
+          const vote = array_votes.some((array) => array.includes(idUser));
+          console.log(vote);
+          resolve(vote);
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      });
+    });
+  }
+
+  async votePoll(idUser: number, idOption: number) {
     return new Promise((resolve, reject) => {
       poolKnex.transaction(async (trx) => {
         try {
           const [vote] = await trx('votes').insert({
             user_id: idUser,
-            poll_id: idPoll,
             option_id: idOption
-          }).returning('*');
+          });
           resolve(vote);
         } catch (error) {
           console.log(error);
@@ -147,6 +168,51 @@ class pollService {
       }
       );
     })
+  }
+  async unVotePoll(idUser: number, idOption: number) {
+    return new Promise((resolve, reject) => {
+      poolKnex.transaction(async (trx) => {
+        try {
+          const vote = await trx('votes').delete().where('user_id', idUser).andWhere('option_id', idOption);
+          resolve(vote);
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      }
+      );
+    })
+  }
+  async insertOption(options: Option) {
+     return new Promise((resolve, reject) => {
+      poolKnex.transaction(async (trx) => {
+        try {
+          const [option] = await trx('option').insert({
+            poll_id: options.poll_id,
+            option_text: options.option_text
+          });
+          resolve(option);
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      }
+      );
+    })
+
+  }
+  async deleteOption(idOption: number) {
+    return new Promise((resolve, reject) => {
+      poolKnex.transaction(async (trx) => {
+        try {
+          const option = await trx('option').delete().where('option_id', idOption);
+          resolve(option);
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      })
+    });
   }
 }
 
