@@ -1,8 +1,10 @@
 import express from 'express';
 import env from 'dotenv';
+import cors from 'cors';
 import routers  from './src/route/index';
 import {errorHandler} from './src/middleware/index';
 const app = express();
+app.use(cors());
 app.use(express.json());
 env.config();
 app.use('/api', routers);

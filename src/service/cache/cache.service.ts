@@ -21,7 +21,7 @@ class CacheService {
                 await redis.connect();
             }
             const value: any = await redis.get(key + ':' + nestedKey);
-            await redis.quit();
+            // await redis.quit();
             return JSON.parse(value);
         } catch (err) {
             console.log(err);
@@ -33,7 +33,7 @@ class CacheService {
           await redis.connect();
         }
         await redis.del(key + ':' + nestedKey);
-        await redis.quit();
+        // await redis.quit();
       }
 }
 export default new CacheService();
