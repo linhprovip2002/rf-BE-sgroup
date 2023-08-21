@@ -2,7 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import {userService} from './index';
 import cacheService from '../../service/cache/cache.service';
 class UserController {
-    getUsers(req, res: Response, next: NextFunction): void {
+    getUsers(req, res: Response, next: NextFunction): void { 
+        let { page, limit } = req.query;
+        if (page && limit) {
+            page = parseInt(page);
+            limit = parseInt(limit);
+            userService.getAllUserPagination(page, limit).then((users) => {
+                return res.status(200).json(users);
+            }).catch((err) => {
+                next(err);
+            });
+        } else {
+
         cacheService.get('users', 888).then((users) => {
             if (users) {
                 console.log('get users from cache');
@@ -19,6 +30,7 @@ class UserController {
         }).catch((err) => {
             next(err);
         });
+    }
     }
     getUserById(req: Request, res: Response, next: NextFunction): void {
         const idUser: number = parseInt(req.params.id);

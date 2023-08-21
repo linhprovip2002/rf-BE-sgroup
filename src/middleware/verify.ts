@@ -36,7 +36,8 @@ export async function verify(req: CustomRequest, res: Response, next: NextFuncti
     } else {
       throw new Error('No token provided');
     }
-  } catch (err) {
+  } catch (err:any) {
+    err.status = 401;
     next(err);
   }
 }

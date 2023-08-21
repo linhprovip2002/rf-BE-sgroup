@@ -8,7 +8,7 @@ class authController {
     static dateNow = Date.now();
     async login(req: Request, res: Response, next: NextFunction) {
         const { username, password } = req.body;
-        console.log(username, password);
+        // console.log(username, password);
         
         const user = await authService.getUserByUsername(username);
         if (!user) {

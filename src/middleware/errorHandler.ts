@@ -4,6 +4,7 @@ const errorHandler = (err, req, res, next) => {
   console.log('Params:', req.params);
   console.log('Body:', req.body);
   console.log('Query:', req.query);
+  console.log('Error:', err.messageObject || err.message);
   console.log('--------------------------------------------------------------------------------------');
 
   const messageError = err.messageObject || err.message;

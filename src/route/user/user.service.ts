@@ -55,5 +55,18 @@ class userService
             );
         });
     }
+    async getAllUserPagination(page: number, limit: number): Promise<User[]>
+    {   
+        console.log("pagination");
+        
+        return new Promise((resolve,reject) => {
+            poolKnex('users').select().limit(limit).offset((page - 1) * limit).then((users) => {
+                resolve(users);
+            }).catch((err) => {
+                reject(err);
+            });
+        }
+        );
+    }
 }
 export default new userService();
