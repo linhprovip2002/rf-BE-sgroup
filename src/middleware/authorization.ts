@@ -8,7 +8,7 @@ export default function checkAuthorization(permission: string) {
         
         cacheService.get('userPermission', idUser).then((result) => {
             if (result != null) {
-                console.log("hahahaha");
+                // console.log("hahahaha");
                 // console.log('get permission from cache', result);
                 return result.includes(permission) ? next() : res.status(403).json('You do not have permission to access');
             } else {

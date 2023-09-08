@@ -24,7 +24,7 @@ class CacheService {
             // await redis.quit();
             return JSON.parse(value);
         } catch (err) {
-            console.log("gettttt" + err);
+            // console.log("gettttt" + err);
             throw err;
         }
     }

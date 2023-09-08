@@ -11,7 +11,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "dev": "ts-node-dev index.ts",
+    "dev": "ts-node-dev src/index.ts",
     "lint": "eslint --ext .ts ."
   },
   "dependencies": {

@@ -1,7 +1,10 @@
 import * as redis from 'redis';
-const instance = redis.createClient({
-  url: process.env.REDIS_URL,
-});
+import env from 'dotenv';
+env.config();
+const redisUrl = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+console.log(redisUrl)
+const instance = redis.createClient(
+  { url: redisUrl });
 
 instance.on('connect', () => {
   console.log('Redis client connected');
@@ -10,5 +13,5 @@ instance.on('connect', () => {
 instance.on('error', (err) => {
   console.log('Something went wrong ' + err);
 });
-
+instance.connect()
 export default instance;

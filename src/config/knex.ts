@@ -1,13 +1,14 @@
 import knex from 'knex';
 import env from 'dotenv';
+
 env.config();
 const config = {
   client: 'mysql',
   connection: {
-    host: '127.0.0.1',
+    host: process.env.DATABASE_HOST,
     port: 3306,
     user: 'root',
-    password: '',
+    password: process.env.PASSWORD,
     database: process.env.DATABASE
   },
   pool: {
@@ -16,5 +17,4 @@ const config = {
   }
 };
 const poolKnex = knex(config);
-
 export default poolKnex;
