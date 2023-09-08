@@ -50,6 +50,18 @@ services:
       - "6379:6379"
     networks:
       - app-network
+  nginx:
+    image: nginx:1.19
+    container_name: app_nginx
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - app-network    
 networks:
   app-network:
     driver: bridge
